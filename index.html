@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriGenius AI — IBM Watsonx.ai Nutrition & Fitness Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- SIDEBAR NAVIGATION -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-logo"><i class="fa-solid fa-leaf"></i></div>
+    <div class="brand-text">
+      <span class="brand-name">NutriGenius</span>
+      <span class="brand-tag">AI by IBM Watsonx</span>
+    </div>
+    <button class="sidebar-close" id="sidebarClose"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <span class="nav-label">Main</span>
+      <a href="#" class="nav-item active" data-section="chat">
+        <i class="fa-solid fa-comments"></i><span>AI Chat</span>
+        <span class="nav-badge">Live</span>
+      </a>
+      <a href="#" class="nav-item" data-section="dashboard">
+        <i class="fa-solid fa-chart-line"></i><span>Dashboard</span>
+      </a>
+    </div>
+    <div class="nav-group">
+      <span class="nav-label">Nutrition</span>
+      <a href="#" class="nav-item" data-section="mealplan">
+        <i class="fa-solid fa-utensils"></i><span>Meal Planner</span>
+      </a>
+      <a href="#" class="nav-item" data-section="calorie">
+        <i class="fa-solid fa-fire"></i><span>Calorie Counter</span>
+      </a>
+      <a href="#" class="nav-item" data-section="scanner">
+        <i class="fa-solid fa-camera"></i><span>Food Scanner</span>
+      </a>
+    </div>
+    <div class="nav-group">
+      <span class="nav-label">Fitness</span>
+      <a href="#" class="nav-item" data-section="yoga">
+        <i class="fa-solid fa-person-praying"></i><span>Yoga Routines</span>
+      </a>
+      <a href="#" class="nav-item" data-section="bmi">
+        <i class="fa-solid fa-weight-scale"></i><span>BMI Calculator</span>
+      </a>
+    </div>
+    <div class="nav-group">
+      <span class="nav-label">Family</span>
+      <a href="#" class="nav-item" data-section="family">
+        <i class="fa-solid fa-users"></i><span>Family Profiles</span>
+      </a>
+      <a href="#" class="nav-item" data-section="profile">
+        <i class="fa-solid fa-user-circle"></i><span>My Profile</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="theme-toggle-wrap">
+      <span><i class="fa-solid fa-moon"></i> Dark Mode</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="darkModeToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="ibm-badge">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM" style="height:18px;filter:var(--ibm-logo-filter);" />
+      <span>Powered by Watsonx.ai</span>
+    </div>
+  </div>
+</aside>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- MAIN LAYOUT -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div class="main-wrapper">
+
+  <!-- TOP NAV BAR -->
+  <header class="topbar">
+    <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+    <div class="topbar-title" id="topbarTitle">AI Chat Assistant</div>
+    <div class="topbar-actions">
+      <button class="icon-btn" title="Voice" id="voiceBtn"><i class="fa-solid fa-microphone"></i></button>
+      <button class="icon-btn" title="Notifications"><i class="fa-solid fa-bell"></i></button>
+      <div class="avatar-wrap" id="avatarBtn">
+        <div class="avatar">N</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: AI CHAT -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section active" id="section-chat">
+    <div class="chat-layout">
+      <!-- Chat window -->
+      <div class="chat-main">
+        <div class="chat-messages" id="chatMessages">
+          <!-- Welcome message -->
+          <div class="msg-wrap bot-wrap">
+            <div class="msg-avatar bot-avatar"><i class="fa-solid fa-leaf"></i></div>
+            <div class="msg-bubble bot-bubble">
+              <p>🌿 <strong>Namaste! I'm NutriGenius</strong>, your AI-powered Nutrition & Fitness Coach built on IBM Watsonx.ai Granite.</p>
+              <p>I can help you with:</p>
+              <div class="quick-chips">
+                <button class="chip" onclick="sendQuick('Create a full day meal plan for me')">🍱 Meal Plan</button>
+                <button class="chip" onclick="sendQuick('Build a yoga routine for beginners')">🧘 Yoga Routine</button>
+                <button class="chip" onclick="sendQuick('What are the health benefits of turmeric?')">🌿 Nutrition Facts</button>
+                <button class="chip" onclick="sendQuick('I have diabetes, what should I eat today?')">💊 Health Advice</button>
+                <button class="chip" onclick="sendQuick('Suggest healthy Indian breakfast options')">🌅 Breakfast Ideas</button>
+                <button class="chip" onclick="sendQuick('मुझे वजन कम करने के लिए क्या खाना चाहिए?')">🇮🇳 हिंदी में पूछें</button>
+              </div>
+              <span class="msg-time">Just now</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing indicator -->
+        <div class="typing-indicator hidden" id="typingIndicator">
+          <div class="msg-avatar bot-avatar"><i class="fa-solid fa-leaf"></i></div>
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+        </div>
+
+        <!-- Chat input -->
+        <div class="chat-input-wrap">
+          <button class="input-action" id="imageUploadBtn" title="Upload food image">
+            <i class="fa-solid fa-image"></i>
+          </button>
+          <input type="file" id="imageFileInput" accept="image/*" style="display:none" />
+          <textarea id="chatInput" placeholder="Ask me about nutrition, meals, yoga, health... (Type in English or हिंदी)" rows="1"></textarea>
+          <button class="input-action voice-action" id="micBtn" title="Voice input">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat sidebar -->
+      <div class="chat-sidebar">
+        <div class="chat-panel">
+          <h4><i class="fa-solid fa-user"></i> Quick Profile</h4>
+          <div class="form-group">
+            <label>Goal</label>
+            <select id="quickGoal" class="form-control">
+              <option value="weight_loss">Weight Loss</option>
+              <option value="muscle_gain">Muscle Gain</option>
+              <option value="maintenance" selected>Maintenance</option>
+              <option value="diabetes_control">Diabetes Control</option>
+              <option value="heart_health">Heart Health</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Diet Type</label>
+            <select id="quickDiet" class="form-control">
+              <option value="vegetarian" selected>Vegetarian</option>
+              <option value="vegan">Vegan</option>
+              <option value="non_vegetarian">Non-Vegetarian</option>
+              <option value="jain">Jain</option>
+              <option value="sattvic">Sattvic</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Health Conditions</label>
+            <div class="checkbox-group">
+              <label><input type="checkbox" id="cond-diabetes" /> Diabetes</label>
+              <label><input type="checkbox" id="cond-bp" /> Hypertension</label>
+              <label><input type="checkbox" id="cond-pcod" /> PCOD/PCOS</label>
+              <label><input type="checkbox" id="cond-thyroid" /> Thyroid</label>
+              <label><input type="checkbox" id="cond-heart" /> Heart Disease</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Allergies</label>
+            <div class="checkbox-group">
+              <label><input type="checkbox" id="allergy-nuts" /> Nuts</label>
+              <label><input type="checkbox" id="allergy-gluten" /> Gluten</label>
+              <label><input type="checkbox" id="allergy-dairy" /> Dairy</label>
+              <label><input type="checkbox" id="allergy-eggs" /> Eggs</label>
+            </div>
+          </div>
+          <button class="btn-primary btn-full" onclick="applyQuickProfile()">
+            <i class="fa-solid fa-check"></i> Apply Profile
+          </button>
+        </div>
+
+        <div class="chat-panel">
+          <h4><i class="fa-solid fa-clock-rotate-left"></i> Recent Topics</h4>
+          <div class="recent-list" id="recentList">
+            <p class="muted-text">Your recent conversations will appear here.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: DASHBOARD -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section" id="section-dashboard">
+    <div class="section-header">
+      <h2>Nutrition Dashboard</h2>
+      <p>Your daily health overview at a glance</p>
+    </div>
+
+    <!-- ── STAT RINGS (live) ─────────────────────────────────────────── -->
+    <div class="stats-grid">
+      <!-- Calories -->
+      <div class="stat-card accent-green">
+        <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Calories Today</span>
+          <span class="stat-value" id="dc-cal-val">—</span>
+          <span class="stat-sub"  id="dc-cal-sub">—</span>
+        </div>
+        <div class="stat-ring">
+          <svg viewBox="0 0 36 36" class="ring-svg">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--ring-track)" stroke-width="3"/>
+            <path id="dc-cal-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-green)" stroke-width="3" stroke-dasharray="0,100" stroke-linecap="round"/>
+          </svg>
+          <span class="ring-label" id="dc-cal-pct">0%</span>
+        </div>
+      </div>
+
+      <!-- Water — entire card is clickable -->
+      <div class="stat-card accent-blue dash-water-card" id="waterCard" title="Click to log +1 glass" onclick="dashAddWater()" style="cursor:pointer;">
+        <div class="stat-icon"><i class="fa-solid fa-droplet"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Hydration <span style="font-size:10px;opacity:.7">(tap +1)</span></span>
+          <span class="stat-value" id="dc-water-val">—</span>
+          <span class="stat-sub"  id="dc-water-sub">—</span>
+        </div>
+        <div class="stat-ring">
+          <svg viewBox="0 0 36 36" class="ring-svg">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--ring-track)" stroke-width="3"/>
+            <path id="dc-water-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-blue)" stroke-width="3" stroke-dasharray="0,100" stroke-linecap="round"/>
+          </svg>
+          <span class="ring-label" id="dc-water-pct">0%</span>
+        </div>
+      </div>
+
+      <!-- Protein -->
+      <div class="stat-card accent-purple">
+        <div class="stat-icon"><i class="fa-solid fa-dumbbell"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Protein</span>
+          <span class="stat-value" id="dc-prot-val">—</span>
+          <span class="stat-sub"  id="dc-prot-sub">—</span>
+        </div>
+        <div class="stat-ring">
+          <svg viewBox="0 0 36 36" class="ring-svg">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--ring-track)" stroke-width="3"/>
+            <path id="dc-prot-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-purple)" stroke-width="3" stroke-dasharray="0,100" stroke-linecap="round"/>
+          </svg>
+          <span class="ring-label" id="dc-prot-pct">0%</span>
+        </div>
+      </div>
+
+      <!-- Steps — card opens inline step-edit on click -->
+      <div class="stat-card accent-orange">
+        <div class="stat-icon"><i class="fa-solid fa-person-walking"></i></div>
+        <div class="stat-body">
+          <span class="stat-label">Steps</span>
+          <span class="stat-value" id="dc-steps-val">—</span>
+          <span class="stat-sub"  id="dc-steps-sub">—</span>
+        </div>
+        <div class="stat-ring" style="cursor:pointer;" onclick="openStepsEditor()" title="Click to update steps">
+          <svg viewBox="0 0 36 36" class="ring-svg">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--ring-track)" stroke-width="3"/>
+            <path id="dc-steps-ring" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-orange)" stroke-width="3" stroke-dasharray="0,100" stroke-linecap="round"/>
+          </svg>
+          <span class="ring-label" id="dc-steps-pct">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Steps inline editor (hidden by default) -->
+    <div class="dash-steps-editor hidden" id="stepsEditor">
+      <i class="fa-solid fa-person-walking"></i>
+      <span>Update today's steps:</span>
+      <input type="number" id="stepsInput" class="form-control" placeholder="e.g. 8500" min="0" max="100000" style="width:130px;" />
+      <button class="btn-primary" onclick="dashUpdateSteps()"><i class="fa-solid fa-check"></i> Save</button>
+      <button class="btn-secondary" onclick="document.getElementById('stepsEditor').classList.add('hidden')">Cancel</button>
+    </div>
+
+    <!-- ── MACRO BREAKDOWN + MEAL LOG ──────────────────────────────────── -->
+    <div class="dashboard-row">
+
+      <!-- Macro bars (live) -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-chart-pie"></i> Macro Breakdown</h3>
+          <span class="card-badge" id="dc-macro-date">Today</span>
+        </div>
+        <div class="macro-bars" id="dc-macro-bars">
+          <!-- Rendered by refreshDashboardUI() -->
+          <div style="text-align:center;padding:32px 0;color:var(--text-muted)"><div class="spinner" style="margin:0 auto 10px"></div>Loading…</div>
+        </div>
+      </div>
+
+      <!-- Meal log (live) -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-bowl-food"></i> Today's Meals</h3>
+          <span class="card-badge" id="dc-meal-count">— logged</span>
+        </div>
+        <!-- Dynamic meal entries injected here -->
+        <div class="meal-timeline" id="dynamicMealsContainer">
+          <div style="text-align:center;padding:32px 0;color:var(--text-muted)"><div class="spinner" style="margin:0 auto 10px"></div>Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LOG NEW MEAL PANEL ────────────────────────────────────────────── -->
+    <div class="dash-log-panel" id="dashLogPanel">
+      <div class="dash-log-header">
+        <span><i class="fa-solid fa-plus-circle"></i> Log New Nutritional Entry</span>
+        <button class="dash-log-toggle" id="dashLogToggle" onclick="toggleLogPanel()">
+          <i class="fa-solid fa-chevron-down" id="dashLogChevron"></i>
+        </button>
+      </div>
+      <div class="dash-log-body" id="dashLogBody">
+        <div class="dash-log-fields">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Meal Type</label>
+            <select id="logMealType" class="form-control">
+              <option value="Breakfast">🌅 Breakfast</option>
+              <option value="Snack">🍎 Snack</option>
+              <option value="Lunch">🍱 Lunch</option>
+              <option value="Dinner">🌙 Dinner</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Item Name</label>
+            <input type="text" id="logMealName" class="form-control" placeholder="e.g. Paneer Bhurji" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Calories (kcal)</label>
+            <input type="number" id="logMealCal" class="form-control" placeholder="e.g. 350" min="1" max="5000" />
+          </div>
+          <button class="btn-primary dash-log-submit" onclick="dashAddMeal()" id="logSubmitBtn">
+            <i class="fa-solid fa-plus"></i> Add to Log
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Daily Tip -->
+    <div class="ai-tip-card" id="dashAiTip" style="margin-top:20px;">
+      <div class="ai-tip-icon"><i class="fa-solid fa-lightbulb"></i></div>
+      <div class="ai-tip-text">
+        <strong>AI Tip of the Day:</strong> Click below to get a personalised health tip powered by IBM Watsonx.ai Granite.
+      </div>
+      <button class="btn-secondary" onclick="getDailyTip()"><i class="fa-solid fa-wand-magic-sparkles"></i> Get My Tip</button>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: MEAL PLANNER -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section" id="section-mealplan">
+    <div class="section-header">
+      <h2>🍱 AI Meal Planner</h2>
+      <p>Generate a personalised full-day meal plan powered by IBM Watsonx.ai</p>
+    </div>
+
+    <div class="two-col">
+      <!-- Preferences -->
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-sliders"></i> Plan Preferences</h3></div>
+        <div class="form-group">
+          <label>Calorie Target (kcal)</label>
+          <input type="number" id="mpCalories" class="form-control" value="1800" min="800" max="4000" />
+        </div>
+        <div class="form-group">
+          <label>Diet Style</label>
+          <select id="mpDiet" class="form-control">
+            <option value="balanced_indian">Balanced Indian</option>
+            <option value="low_carb">Low Carb</option>
+            <option value="high_protein">High Protein</option>
+            <option value="mediterranean">Mediterranean</option>
+            <option value="keto">Keto</option>
+            <option value="dash">DASH (Heart-healthy)</option>
+            <option value="diabetic_friendly">Diabetic Friendly</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cuisine Preference</label>
+          <select id="mpCuisine" class="form-control">
+            <option value="north_indian">North Indian</option>
+            <option value="south_indian">South Indian</option>
+            <option value="gujarat">Gujarati</option>
+            <option value="bengali">Bengali</option>
+            <option value="mixed_indian">Mixed Indian</option>
+            <option value="global">Global Mix</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Special Instructions</label>
+          <textarea id="mpSpecial" class="form-control" rows="3" placeholder="e.g., Avoid onion-garlic, No spicy food, Quick 15-min meals..."></textarea>
+        </div>
+        <button class="btn-primary btn-full" onclick="generateMealPlan()" id="mpBtn">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Full Day Meal Plan
+        </button>
+      </div>
+
+      <!-- Result -->
+      <div class="card result-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-utensils"></i> Your Meal Plan</h3>
+          <button class="btn-icon" onclick="copyResult('mpResult')" title="Copy"><i class="fa-solid fa-copy"></i></button>
+        </div>
+        <div class="ai-result" id="mpResult">
+          <div class="result-placeholder">
+            <i class="fa-solid fa-bowl-rice"></i>
+            <p>Your personalised meal plan will appear here.</p>
+            <p class="muted-text">Set your preferences and click Generate.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: CALORIE COUNTER -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section" id="section-calorie">
+    <div class="section-header">
+      <h2>🔥 Calorie Counter</h2>
+      <p>Log your foods and get AI-powered macro analysis</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-plus-circle"></i> Add Foods</h3></div>
+        <div id="foodList">
+          <div class="food-entry">
+            <input type="text" class="form-control food-name" placeholder="Food item (e.g., Chapati)" />
+            <input type="text" class="form-control food-qty" placeholder="Quantity (e.g., 2 pieces)" />
+            <button class="btn-icon-danger" onclick="removeFoodEntry(this)"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+        <button class="btn-secondary" onclick="addFoodEntry()" style="margin-top:12px;">
+          <i class="fa-solid fa-plus"></i> Add Another Food
+        </button>
+        <div style="margin-top:20px;">
+          <button class="btn-primary btn-full" onclick="analyzeCalories()" id="calBtn">
+            <i class="fa-solid fa-calculator"></i> Analyse Calories & Macros
+          </button>
+        </div>
+
+        <!-- Quick lookup -->
+        <div class="card-divider"></div>
+        <div class="card-header"><h3><i class="fa-solid fa-magnifying-glass"></i> Quick Nutrition Lookup</h3></div>
+        <div class="input-row">
+          <input type="text" id="lookupFood" class="form-control" placeholder="e.g., 100g brown rice" />
+          <input type="text" id="lookupQty" class="form-control" placeholder="Quantity" style="max-width:120px;" />
+          <button class="btn-primary" onclick="lookupNutrition()"><i class="fa-solid fa-search"></i></button>
+        </div>
+      </div>
+
+      <div class="card result-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-chart-bar"></i> Analysis Result</h3>
+          <button class="btn-icon" onclick="copyResult('calResult')" title="Copy"><i class="fa-solid fa-copy"></i></button>
+        </div>
+        <div class="ai-result" id="calResult">
+          <div class="result-placeholder">
+            <i class="fa-solid fa-fire-flame-curved"></i>
+            <p>Add foods and click Analyse to see calorie breakdown.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: FOOD SCANNER -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section" id="section-scanner">
+    <div class="section-header">
+      <h2>📸 AI Food Scanner</h2>
+      <p>Upload a meal photo or grocery label for instant nutritional analysis</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-camera"></i> Upload or Describe</h3></div>
+
+        <!-- Upload zone -->
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('scannerFile').click()">
+          <input type="file" id="scannerFile" accept="image/*" style="display:none" onchange="handleScannerFile(event)" />
+          <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <p>Click to upload or drag & drop</p>
+          <p class="muted-text">Supports JPG, PNG, WEBP · Max 5MB</p>
+          <div id="imagePreview" style="display:none; margin-top:16px;">
+            <img id="previewImg" src="" alt="Preview" style="max-width:100%;border-radius:12px;max-height:200px;object-fit:cover;" />
+          </div>
+        </div>
+
+        <div class="or-divider"><span>OR</span></div>
+
+        <div class="form-group">
+          <label>Describe your meal / Read the label</label>
+          <textarea id="scanDesc" class="form-control" rows="4" placeholder="e.g., A plate with 2 rotis, sabzi of mixed vegetables, and a bowl of dal. OR: Maggi noodles packet ingredients list..."></textarea>
+        </div>
+
+        <button class="btn-primary btn-full" onclick="analyzeFood()" id="scanBtn">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Analyse Food / Label
+        </button>
+      </div>
+
+      <div class="card result-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-microscope"></i> Analysis Result</h3>
+          <button class="btn-icon" onclick="copyResult('scanResult')" title="Copy"><i class="fa-solid fa-copy"></i></button>
+        </div>
+        <div class="ai-result" id="scanResult">
+          <div class="result-placeholder">
+            <i class="fa-solid fa-camera-retro"></i>
+            <p>Upload an image or describe your meal to get nutritional analysis.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: YOGA ROUTINES -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section" id="section-yoga">
+    <div class="section-header">
+      <h2>🧘 Yoga Routine Builder</h2>
+      <p>AI-crafted targeted yoga routines for your specific needs</p>
+    </div>
+
+    <!-- Profile cards -->
+    <div class="yoga-profiles">
+      <div class="yoga-profile-card" data-profile="Beginners" onclick="selectYogaProfile(this)">
+        <div class="yp-icon">🌱</div>
+        <span>Beginners</span>
+      </div>
+      <div class="yoga-profile-card" data-profile="Seniors" onclick="selectYogaProfile(this)">
+        <div class="yp-icon">🧓</div>
+        <span>Seniors</span>
+      </div>
+      <div class="yoga-profile-card" data-profile="Working Professionals" onclick="selectYogaProfile(this)">
+        <div class="yp-icon">💼</div>
+        <span>Working Professionals</span>
+      </div>
+      <div class="yoga-profile-card" data-profile="Pregnant Women" onclick="selectYogaProfile(this)">
+        <div class="yp-icon">🤰</div>
+        <span>Pregnant Women</span>
+      </div>
+      <div class="yoga-profile-card" data-profile="Athletes" onclick="selectYogaProfile(this)">
+        <div class="yp-icon">🏃</div>
+        <span>Athletes</span>
+      </div>
+      <div class="yoga-profile-card" data-profile="Lower Back Pain" onclick="selectYogaProfile(this)">
+        <div class="yp-icon">🦴</div>
+        <span>Lower Back Pain</span>
+      </div>
+      <div class="yoga-profile-card" data-profile="Stress & Anxiety" onclick="selectYogaProfile(this)">
+        <div class="yp-icon">🧠</div>
+        <span>Stress & Anxiety</span>
+      </div>
+      <div class="yoga-profile-card" data-profile="Insomnia & Poor Sleep" onclick="selectYogaProfile(this)">
+        <div class="yp-icon">🌙</div>
+        <span>Insomnia</span>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-sliders"></i> Routine Settings</h3></div>
+        <div class="form-group">
+          <label>Selected Profile</label>
+          <input type="text" id="yogaProfile" class="form-control" value="Beginners" readonly />
+        </div>
+        <div class="form-group">
+          <label>Duration</label>
+          <select id="yogaDuration" class="form-control">
+            <option value="15">15 minutes</option>
+            <option value="20">20 minutes</option>
+            <option value="30" selected>30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Focus Area</label>
+          <select id="yogaFocus" class="form-control">
+            <option value="General Wellness">General Wellness</option>
+            <option value="Flexibility & Stretching">Flexibility & Stretching</option>
+            <option value="Stress Relief & Breathing">Stress Relief & Breathing</option>
+            <option value="Core Strength">Core Strength</option>
+            <option value="Balance & Posture">Balance & Posture</option>
+            <option value="Hip & Shoulder Opening">Hip & Shoulder Opening</option>
+            <option value="Immune Boost">Immune Boost</option>
+            <option value="Digestive Health">Digestive Health</option>
+          </select>
+        </div>
+        <button class="btn-primary btn-full" onclick="generateYogaRoutine()" id="yogaBtn">
+          <i class="fa-solid fa-person-praying"></i> Generate My Routine
+        </button>
+      </div>
+
+      <div class="card result-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-list-check"></i> Your Yoga Routine</h3>
+          <button class="btn-icon" onclick="copyResult('yogaResult')" title="Copy"><i class="fa-solid fa-copy"></i></button>
+        </div>
+        <div class="ai-result" id="yogaResult">
+          <div class="result-placeholder">
+            <i class="fa-solid fa-person-praying"></i>
+            <p>Select your profile and click Generate to build your routine.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: BMI CALCULATOR -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section" id="section-bmi">
+    <div class="section-header">
+      <h2>⚖️ BMI Calculator & Health Insights</h2>
+      <p>Calculate your BMI and get AI-powered personalised health recommendations</p>
+    </div>
+
+    <div class="bmi-layout">
+      <!-- Input -->
+      <div class="card bmi-input-card">
+        <div class="card-header"><h3><i class="fa-solid fa-ruler"></i> Your Measurements</h3></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="bmiWeight" class="form-control" placeholder="65" min="10" max="300" />
+          </div>
+          <div class="form-group">
+            <label>Height (cm)</label>
+            <input type="number" id="bmiHeight" class="form-control" placeholder="165" min="50" max="250" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="bmiAge" class="form-control" placeholder="30" min="1" max="120" />
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="bmiGender" class="form-control">
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary btn-full" onclick="calculateBMI()" id="bmiBtn">
+          <i class="fa-solid fa-calculator"></i> Calculate BMI & Get Insights
+        </button>
+      </div>
+
+      <!-- BMI Result gauge -->
+      <div class="card bmi-result-card" id="bmiResultCard" style="display:none;">
+        <div class="bmi-gauge-wrap">
+          <div class="bmi-value-display">
+            <span class="bmi-number" id="bmiNumber">--</span>
+            <span class="bmi-category" id="bmiCategory">--</span>
+          </div>
+          <div class="bmi-scale">
+            <div class="scale-bar">
+              <div class="scale-seg" style="background:#3b82f6;flex:1.85">
+                <span>Underweight<br/>&lt;18.5</span>
+              </div>
+              <div class="scale-seg" style="background:#22c55e;flex:6.4">
+                <span>Normal<br/>18.5–24.9</span>
+              </div>
+              <div class="scale-seg" style="background:#f59e0b;flex:5">
+                <span>Overweight<br/>25–29.9</span>
+              </div>
+              <div class="scale-seg" style="background:#ef4444;flex:6">
+                <span>Obese<br/>≥30</span>
+              </div>
+            </div>
+            <div class="scale-indicator" id="bmiIndicator" style="left:50%"></div>
+          </div>
+          <div class="bmi-meta">
+            <div class="bmi-meta-item">
+              <span class="bmi-meta-label">Ideal Range</span>
+              <span class="bmi-meta-val" id="bmiIdeal">--</span>
+            </div>
+            <div class="bmi-meta-item">
+              <span class="bmi-meta-label">BMR (Basal)</span>
+              <span class="bmi-meta-val" id="bmiBmr">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Insights -->
+      <div class="card bmi-insights-card result-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-brain"></i> AI Health Insights</h3>
+          <button class="btn-icon" onclick="copyResult('bmiInsights')" title="Copy"><i class="fa-solid fa-copy"></i></button>
+        </div>
+        <div class="ai-result" id="bmiInsights">
+          <div class="result-placeholder">
+            <i class="fa-solid fa-weight-scale"></i>
+            <p>Enter your measurements and click Calculate to get personalised AI insights.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: FAMILY PROFILES -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section" id="section-family">
+    <div class="section-header">
+      <h2>👨‍👩‍👧‍👦 Family Diet Planner</h2>
+      <p>Personalised nutrition for every family member</p>
+    </div>
+
+    <div class="family-grid" id="familyGrid">
+      <!-- Member cards dynamically populated -->
+    </div>
+
+    <button class="btn-secondary" onclick="addFamilyMember()" style="margin-top:16px;">
+      <i class="fa-solid fa-plus"></i> Add Family Member
+    </button>
+
+    <div class="card" style="margin-top:24px;">
+      <div class="card-header">
+        <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Family Plan</h3>
+      </div>
+      <p class="muted-text" style="margin-bottom:16px;">Click below to generate personalised nutrition recommendations for all added family members simultaneously.</p>
+      <button class="btn-primary btn-full" onclick="generateFamilyPlan()" id="familyBtn">
+        <i class="fa-solid fa-users"></i> Generate Family Nutrition Plan
+      </button>
+    </div>
+
+    <div class="card result-card" style="margin-top:24px;" id="familyResultCard">
+      <div class="card-header">
+        <h3><i class="fa-solid fa-list"></i> Family Plan</h3>
+        <button class="btn-icon" onclick="copyResult('familyResult')" title="Copy"><i class="fa-solid fa-copy"></i></button>
+      </div>
+      <div class="ai-result" id="familyResult">
+        <div class="result-placeholder">
+          <i class="fa-solid fa-people-group"></i>
+          <p>Add family members and click Generate to create personalised plans.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <!-- SECTION: MY PROFILE -->
+  <!-- ─────────────────────────────────────────────────────────────────── -->
+  <section class="content-section" id="section-profile">
+    <div class="section-header">
+      <h2>👤 My Profile</h2>
+      <p>Set your personal details for fully personalised AI recommendations</p>
+    </div>
+
+    <div class="profile-layout">
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-id-card"></i> Personal Information</h3></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="profName" class="form-control" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="profAge" class="form-control" placeholder="25" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Gender</label>
+            <select id="profGender" class="form-control">
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+              <option value="other">Other / Prefer not to say</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Language Preference</label>
+            <select id="profLang" class="form-control">
+              <option value="English">English</option>
+              <option value="Hindi">हिंदी (Hindi)</option>
+              <option value="Hinglish">Hinglish (Mixed)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="profWeight" class="form-control" placeholder="60" />
+          </div>
+          <div class="form-group">
+            <label>Height (cm)</label>
+            <input type="number" id="profHeight" class="form-control" placeholder="165" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-bullseye"></i> Goals & Diet</h3></div>
+        <div class="form-group">
+          <label>Fitness Goal</label>
+          <select id="profGoal" class="form-control">
+            <option value="weight_loss">Weight Loss</option>
+            <option value="muscle_gain">Muscle Gain</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="diabetes_control">Diabetes Control</option>
+            <option value="heart_health">Heart Health</option>
+            <option value="energy_boost">Energy Boost</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Diet Type</label>
+          <select id="profDiet" class="form-control">
+            <option value="vegetarian">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="non_vegetarian">Non-Vegetarian</option>
+            <option value="jain">Jain</option>
+            <option value="sattvic">Sattvic</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Activity Level</label>
+          <select id="profActivity" class="form-control">
+            <option value="sedentary">Sedentary (Desk job)</option>
+            <option value="light">Lightly Active</option>
+            <option value="moderate">Moderately Active</option>
+            <option value="very_active">Very Active</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cuisine Preference</label>
+          <select id="profCuisine" class="form-control">
+            <option value="north_indian">North Indian</option>
+            <option value="south_indian">South Indian</option>
+            <option value="gujarati">Gujarati</option>
+            <option value="mixed_indian">Mixed Indian</option>
+            <option value="global">Global Mix</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><h3><i class="fa-solid fa-heart-pulse"></i> Health & Allergies</h3></div>
+        <div class="form-group">
+          <label>Health Conditions</label>
+          <div class="checkbox-grid">
+            <label><input type="checkbox" id="p-diabetes" /> Diabetes (Type 2)</label>
+            <label><input type="checkbox" id="p-bp" /> Hypertension</label>
+            <label><input type="checkbox" id="p-pcod" /> PCOD / PCOS</label>
+            <label><input type="checkbox" id="p-thyroid" /> Thyroid</label>
+            <label><input type="checkbox" id="p-heart" /> Heart Disease</label>
+            <label><input type="checkbox" id="p-ibs" /> IBS / Gut Issues</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Food Allergies</label>
+          <div class="checkbox-grid">
+            <label><input type="checkbox" id="p-nuts" /> Nuts</label>
+            <label><input type="checkbox" id="p-gluten" /> Gluten</label>
+            <label><input type="checkbox" id="p-dairy" /> Dairy</label>
+            <label><input type="checkbox" id="p-eggs" /> Eggs</label>
+            <label><input type="checkbox" id="p-soy" /> Soy</label>
+            <label><input type="checkbox" id="p-shellfish" /> Shellfish</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Religious / Dietary Restrictions</label>
+          <input type="text" id="profReligion" class="form-control" placeholder="e.g., No beef, Halal, Kosher, No onion-garlic..." />
+        </div>
+        <button class="btn-primary btn-full" onclick="saveProfile()">
+          <i class="fa-solid fa-floppy-disk"></i> Save Profile
+        </button>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /main-wrapper -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- MODALS -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<!-- Family Member Modal -->
+<div class="modal-backdrop" id="familyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Family Member</h3>
+      <button onclick="closeModal('familyModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="fmName" class="form-control" placeholder="e.g., Amma" />
+        </div>
+        <div class="form-group">
+          <label>Relation</label>
+          <input type="text" id="fmRelation" class="form-control" placeholder="e.g., Mother" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" id="fmAge" class="form-control" placeholder="45" />
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select id="fmGender" class="form-control">
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Health Conditions</label>
+        <input type="text" id="fmConditions" class="form-control" placeholder="e.g., Diabetes, Hypertension" />
+      </div>
+      <div class="form-group">
+        <label>Diet Type</label>
+        <select id="fmDiet" class="form-control">
+          <option value="vegetarian">Vegetarian</option>
+          <option value="non_vegetarian">Non-Vegetarian</option>
+          <option value="vegan">Vegan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Allergies</label>
+        <input type="text" id="fmAllergies" class="form-control" placeholder="e.g., Nuts, Dairy" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('familyModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveFamilyMember()">Add Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
